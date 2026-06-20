@@ -27,25 +27,18 @@ export function CandidateCard({
   candidate,
   rank,
   recommended,
-  selected,
-  onSelect,
+  onChoose,
 }: {
   candidate: ScoredCandidate;
   rank: number;
   recommended: boolean;
-  selected: boolean;
-  onSelect: () => void;
+  onChoose: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const util = Math.round(candidate.projectedUtilization * 100);
 
   return (
-    <Card
-      className={cn(
-        "relative flex flex-col",
-        recommended ? "ring-2 ring-emerald-500" : selected ? "ring-2 ring-slate-300" : undefined,
-      )}
-    >
+    <Card className={cn("relative flex flex-col", recommended && "ring-2 ring-emerald-500")}>
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
@@ -54,11 +47,6 @@ export function CandidateCard({
               {recommended && (
                 <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white">
                   Recommended
-                </span>
-              )}
-              {selected && !recommended && (
-                <span className="rounded-full border border-slate-300 px-2 py-0.5 text-xs font-medium text-slate-600">
-                  Selected
                 </span>
               )}
             </div>
@@ -163,15 +151,15 @@ export function CandidateCard({
         </div>
       </CardContent>
 
-      {/* G12 — accept / choose-another */}
+      {/* G12 — accept / choose-another (opens the decision dialog) */}
       <CardFooter>
         {recommended ? (
-          <Button onClick={onSelect} className="w-full bg-emerald-600 hover:bg-emerald-700">
-            {selected ? "Accepted ✓" : "Accept recommendation"}
+          <Button onClick={onChoose} className="w-full bg-emerald-600 hover:bg-emerald-700">
+            Accept recommendation
           </Button>
         ) : (
-          <Button variant="outline" onClick={onSelect} className="w-full">
-            {selected ? "Selected ✓" : "Choose this instead"}
+          <Button variant="outline" onClick={onChoose} className="w-full">
+            Choose this instead
           </Button>
         )}
       </CardFooter>

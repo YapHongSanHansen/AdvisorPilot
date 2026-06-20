@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { CheckCircle2 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { CandidateCard } from "./candidate-card";
+import { DecisionDialog } from "./decision-dialog";
 import type { Project } from "@/types";
 import type { RankingResult, ScoredCandidate } from "@/lib/scoring";
 
@@ -15,16 +17,14 @@ const STORAGE_KEY = "atlas:lastRecommendation";
 export function RecommendationView() {
   const [payload, setPayload] = useState<Payload | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [pending, setPending] = useState<ScoredCandidate | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [decided, setDecided] = useState<{ employeeName: string; isOverride: boolean } | null>(null);
 
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Payload;
-        setPayload(parsed);
-        setSelectedId(parsed.result.top[0]?.employeeId ?? null);
-      }
+      if (raw) setPayload(JSON.parse(raw) as Payload);
     } catch {
       // ignore malformed storage
     }
@@ -36,15 +36,45 @@ export function RecommendationView() {
 
   const { project, result } = payload;
 
-  // G11 — no valid candidate
   if (result.eligible.length === 0) {
     return <NoValidCandidates project={project} closest={result.ineligible} />;
   }
 
-  const recommendedId = result.top[0]?.employeeId;
+  const recommended = result.top[0];
+  const recommendedId = recommended?.employeeId ?? "";
+
+  function choose(candidate: ScoredCandidate) {
+    setPending(candidate);
+    setDialogOpen(true);
+  }
 
   return (
     <div className="space-y-4">
+      {/* H09 — success message + next action */}
+      {decided && (
+        <div className="flex flex-col gap-3 rounded-lg border border-emerald-300 bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-2">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+            <div>
+              <p className="font-medium text-emerald-900">
+                Decision recorded{decided.isOverride ? " (override)" : ""}.
+              </p>
+              <p className="text-sm text-emerald-800">
+                {decided.employeeName} assigned to {project.name}.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/dashboard" className={cn(buttonVariants({ variant: "outline" }))}>
+              View dashboard
+            </Link>
+            <Link href="/allocate" className={cn(buttonVariants())}>
+              New allocation
+            </Link>
+          </div>
+        </div>
+      )}
+
       <p className="text-sm text-muted-foreground">
         Top {result.top.length} of {result.eligible.length}{" "}
         {result.eligible.length === 1 ? "eligible candidate" : "eligible candidates"} for{" "}
@@ -57,11 +87,24 @@ export function RecommendationView() {
             candidate={candidate}
             rank={i + 1}
             recommended={candidate.employeeId === recommendedId}
-            selected={candidate.employeeId === selectedId}
-            onSelect={() => setSelectedId(candidate.employeeId)}
+            onChoose={() => choose(candidate)}
           />
         ))}
       </div>
+
+      <DecisionDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        candidate={pending}
+        recommendedId={recommendedId}
+        recommendedName={recommended?.employeeName ?? ""}
+        project={project}
+        candidates={result.eligible}
+        onConfirmed={(summary) => {
+          setDecided(summary);
+          setDialogOpen(false);
+        }}
+      />
     </div>
   );
 }

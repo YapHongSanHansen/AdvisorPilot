@@ -19,16 +19,20 @@ export function createSeedFixtures(): DemoFixtures {
   };
 }
 
-// In-memory demo state (scoped to the server instance). The data/API layer reads
-// and mutates this; the spec's fallback is local JSON fixtures + browser storage.
-let fixtures: DemoFixtures = createSeedFixtures();
+// Store on globalThis so there is ONE instance per server process. Next bundles each
+// route separately, which would otherwise duplicate a module-level singleton and make
+// decisions written by /api/decisions invisible to the /dashboard and /audit pages.
+const store = globalThis as unknown as { __atlasFixtures?: DemoFixtures };
 
 export function getFixtures(): DemoFixtures {
-  return fixtures;
+  if (!store.__atlasFixtures) {
+    store.__atlasFixtures = createSeedFixtures();
+  }
+  return store.__atlasFixtures;
 }
 
 /** C11 — Reset all demo data back to the seeded state. Returns the fresh fixtures. */
 export function resetDemoFixtures(): DemoFixtures {
-  fixtures = createSeedFixtures();
-  return fixtures;
+  store.__atlasFixtures = createSeedFixtures();
+  return store.__atlasFixtures;
 }

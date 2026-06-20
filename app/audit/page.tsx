@@ -1,15 +1,35 @@
 import { PageContainer, PageHeader } from "@/components/shared/page-container";
+import { getFixtures } from "@/lib/data";
+import { toAuditDecisions } from "@/lib/audit/metrics";
+import { AuditView } from "@/components/audit/audit-view";
+
+export const dynamic = "force-dynamic";
 
 export default function AuditPage() {
+  const { decisions, employees } = getFixtures();
+
+  const auditDecisions = toAuditDecisions(decisions, employees);
+  const auditEmployees = employees.map((e) => ({
+    id: e.id,
+    name: e.name,
+    team: e.team,
+    assignmentsLast30Days: e.assignmentsLast30Days,
+  }));
+  const teams = [...new Set(employees.map((e) => e.team))].sort();
+  const managers = [...new Set(decisions.map((d) => d.actor))].sort();
+
   return (
     <PageContainer>
       <PageHeader
-        title="Audit"
-        description="Workload concentration and override trends by team and manager."
+        title="Leadership audit"
+        description="Override patterns, workload concentration, and decision history. Flags are prompts for review, not findings."
       />
-      <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-        Capacity & override analytics charts — built in the audit section.
-      </div>
+      <AuditView
+        decisions={auditDecisions}
+        employees={auditEmployees}
+        teams={teams}
+        managers={managers}
+      />
     </PageContainer>
   );
 }

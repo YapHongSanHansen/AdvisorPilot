@@ -20,6 +20,15 @@ build/
 out/
 .cache/
 
+# Next.js / Vercel / TypeScript build
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+.vercel
+/coverage
+*.pem
+
 # Logs
 *.log
 npm-debug.log*

@@ -3,6 +3,7 @@ import {
   PlusCircle,
   Sparkles,
   BarChart3,
+  SlidersHorizontal,
   type LucideIcon,
 } from "lucide-react";
 
@@ -38,5 +39,11 @@ export const navItems: NavItem[] = [
     label: "Audit",
     icon: BarChart3,
     description: "Workload & override analytics",
+  },
+  {
+    href: "/profile",
+    label: "Profile",
+    icon: SlidersHorizontal,
+    description: "Draft & approve work-style",
   },
 ];

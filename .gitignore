@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnp/
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Environment / secrets — never auto-push these
+.env
+.env.*
+!.env.example
+*.local
+
+# Build output
+dist/
+build/
+.next/
+out/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Claude Code local tooling (machine-specific auto-commit hook & settings)
+.claude/

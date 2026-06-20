@@ -19,6 +19,7 @@ import { weightTotal } from "./weights";
 
 /** A scored candidate plus capacity facts used for tie-breaking and the UI. */
 export type ScoredCandidate = RankedCandidate & {
+  team: string;
   availableHours: number;
   projectedUtilization: number;
 };
@@ -80,6 +81,7 @@ function scoreOne(
   return {
     employeeId: employee.id,
     employeeName: employee.name,
+    team: employee.team,
     eligible: gate.eligible,
     scores: breakdown,
     reasons: buildReasons(employee, project, breakdown, teamAvg),

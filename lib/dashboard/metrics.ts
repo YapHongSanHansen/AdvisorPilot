@@ -93,7 +93,7 @@ export function computeDashboardMetrics(
     }));
 
   return {
-    totalPeople: employees.length,
+    totalPeople: active.length,
     openProjects: projects.length,
     totalAvailableHours,
     overloadedCount: overloaded.length,

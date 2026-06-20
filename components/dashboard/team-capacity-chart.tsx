@@ -14,6 +14,13 @@ import type { TeamCapacity } from "@/lib/dashboard/metrics";
 
 /** I04 — allocated vs available hours per team (stacked = total capacity). */
 export function TeamCapacityChart({ data }: { data: TeamCapacity[] }) {
+  if (data.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+        No active team capacity to show yet.
+      </div>
+    );
+  }
   return (
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">

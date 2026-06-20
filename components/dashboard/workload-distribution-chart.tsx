@@ -13,6 +13,13 @@ import type { WorkloadPoint } from "@/lib/dashboard/metrics";
 
 /** I05 — recent assignments per person, surfacing workload concentration. */
 export function WorkloadDistributionChart({ data }: { data: WorkloadPoint[] }) {
+  if (data.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+        No workload data to show yet.
+      </div>
+    );
+  }
   return (
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
